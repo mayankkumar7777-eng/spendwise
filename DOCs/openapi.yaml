@@ -1,0 +1,360 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SpendWise API",
+    "version": "1.0.0",
+    "description": "POST   /api/auth/login            {email,password} -> 200 user + HttpOnly session cookie\n                                   401 INVALID_CREDENTIALS, 423 ACCOUNT_LOCKED\nPOST   /api/auth/logout           -> 204\nGET    /api/me                    -> current user\nGET    /api/claims?status=&month=YYYY-MM&category=&page=\n                                   -> {items,total,page,pageSize,sumAmount}\nPOST   /api/claims                JSON, or multipart/form-data when a receipt is attached:\n                                   date, category, amount, description, receipt?, confirmDuplicate?\n                                   -> 201 claim | 422 VALIDATION_FAILED | 409 DUPLICATE_CLAIM\nGET    /api/claims/{id}           -> claim + history (403/404 if not allowed)\nPATCH  /api/claims/{id}           -> 200 | 409 CLAIM_LOCKED\nDELETE /api/claims/{id}           -> 204 | 409 CLAIM_LOCKED\nGET    /api/claims/{id}/receipt   -> file (owner, their manager, finance only)\nGET    /api/team/claims?status=Submitted -> manager queue\nPOST   /api/claims/{id}/approve   -> 200 | 403 FORBIDDEN | 403 SELF_APPROVAL_NOT_ALLOWED | 409 CLAIM_LOCKED\nPOST   /api/claims/{id}/reject    {comment} -> 200 | 422 COMMENT_REQUIRED\nGET    /api/reports/monthly?month=YYYY-MM -> {month, byCategory[], byEmployee[], statusCounts,\n                                   grandTotal, approvedCount}\nGET    /api/reports/monthly.csv?month=YYYY-MM -> text/csv\nGET    /api/health\n\nError body: {\"error\":{\"code\":\"...\",\"message\":\"...\",\"fields\":[{\"field\":\"amount\",\"code\":\"AMOUNT_OUT_OF_RANGE\",\"message\":\"...\"}]}}\nField codes: AMOUNT_INVALID, AMOUNT_OUT_OF_RANGE, AMOUNT_PRECISION, DATE_INVALID,\nDATE_IN_FUTURE, DATE_BEFORE_POLICY_START, INVALID_CATEGORY, DESCRIPTION_LENGTH,\nMEALS_LIMIT_EXCEEDED, RECEIPT_REQUIRED, FILE_TOO_LARGE, FILE_TYPE_NOT_ALLOWED.\nOther codes: UNAUTHENTICATED (401), FORBIDDEN (403), NOT_FOUND (404).\nMoney in JSON is a string with 2 decimals, e.g. \"1234.50\"."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "operationId": "post__api_auth_login",
+        "summary": "POST /api/auth/login",
+        "description": "POST   /api/auth/login            {email,password} -> 200 user + HttpOnly session cookie",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "post__api_auth_logout",
+        "summary": "POST /api/auth/logout",
+        "description": "POST   /api/auth/logout           -> 204",
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "operationId": "get__api_me",
+        "summary": "GET /api/me",
+        "description": "GET    /api/me                    -> current user",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Error response"
+          },
+          "401": {
+            "description": "Error response"
+          },
+          "403": {
+            "description": "Error response"
+          },
+          "404": {
+            "description": "Error response"
+          },
+          "409": {
+            "description": "Error response"
+          },
+          "422": {
+            "description": "Error response"
+          }
+        }
+      }
+    },
+    "/api/claims": {
+      "get": {
+        "operationId": "get__api_claims",
+        "summary": "GET /api/claims",
+        "description": "GET    /api/claims?status=&month=YYYY-MM&category=&page=",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Error response"
+          },
+          "401": {
+            "description": "Error response"
+          },
+          "403": {
+            "description": "Error response"
+          },
+          "404": {
+            "description": "Error response"
+          },
+          "409": {
+            "description": "Error response"
+          },
+          "422": {
+            "description": "Error response"
+          }
+        }
+      },
+      "post": {
+        "operationId": "post__api_claims",
+        "summary": "POST /api/claims",
+        "description": "POST   /api/claims                JSON, or multipart/form-data when a receipt is attached:",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Error response"
+          },
+          "401": {
+            "description": "Error response"
+          },
+          "403": {
+            "description": "Error response"
+          },
+          "404": {
+            "description": "Error response"
+          },
+          "409": {
+            "description": "Error response"
+          },
+          "422": {
+            "description": "Error response"
+          }
+        }
+      }
+    },
+    "/api/claims/{id}": {
+      "get": {
+        "operationId": "get__api_claims_id",
+        "summary": "GET /api/claims/{id}",
+        "description": "GET    /api/claims/{id}           -> claim + history (403/404 if not allowed)",
+        "responses": {
+          "403": {
+            "description": "Error response"
+          },
+          "404": {
+            "description": "Error response"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch__api_claims_id",
+        "summary": "PATCH /api/claims/{id}",
+        "description": "PATCH  /api/claims/{id}           -> 200 | 409 CLAIM_LOCKED",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "409": {
+            "description": "Error response"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete__api_claims_id",
+        "summary": "DELETE /api/claims/{id}",
+        "description": "DELETE /api/claims/{id}           -> 204 | 409 CLAIM_LOCKED",
+        "responses": {
+          "204": {
+            "description": "Successful response"
+          },
+          "409": {
+            "description": "Error response"
+          }
+        }
+      }
+    },
+    "/api/claims/{id}/receipt": {
+      "get": {
+        "operationId": "get__api_claims_id_receipt",
+        "summary": "GET /api/claims/{id}/receipt",
+        "description": "GET    /api/claims/{id}/receipt   -> file (owner, their manager, finance only)",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Error response"
+          },
+          "401": {
+            "description": "Error response"
+          },
+          "403": {
+            "description": "Error response"
+          },
+          "404": {
+            "description": "Error response"
+          },
+          "409": {
+            "description": "Error response"
+          },
+          "422": {
+            "description": "Error response"
+          }
+        }
+      }
+    },
+    "/api/team/claims": {
+      "get": {
+        "operationId": "get__api_team_claims",
+        "summary": "GET /api/team/claims",
+        "description": "GET    /api/team/claims?status=Submitted -> manager queue",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Error response"
+          },
+          "401": {
+            "description": "Error response"
+          },
+          "403": {
+            "description": "Error response"
+          },
+          "404": {
+            "description": "Error response"
+          },
+          "409": {
+            "description": "Error response"
+          },
+          "422": {
+            "description": "Error response"
+          }
+        }
+      }
+    },
+    "/api/claims/{id}/approve": {
+      "post": {
+        "operationId": "post__api_claims_id_approve",
+        "summary": "POST /api/claims/{id}/approve",
+        "description": "POST   /api/claims/{id}/approve   -> 200 | 403 FORBIDDEN | 403 SELF_APPROVAL_NOT_ALLOWED | 409 CLAIM_LOCKED",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "403": {
+            "description": "Error response"
+          },
+          "409": {
+            "description": "Error response"
+          }
+        }
+      }
+    },
+    "/api/claims/{id}/reject": {
+      "post": {
+        "operationId": "post__api_claims_id_reject",
+        "summary": "POST /api/claims/{id}/reject",
+        "description": "POST   /api/claims/{id}/reject    {comment} -> 200 | 422 COMMENT_REQUIRED",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "422": {
+            "description": "Error response"
+          }
+        }
+      }
+    },
+    "/api/reports/monthly": {
+      "get": {
+        "operationId": "get__api_reports_monthly",
+        "summary": "GET /api/reports/monthly",
+        "description": "GET    /api/reports/monthly?month=YYYY-MM -> {month, byCategory[], byEmployee[], statusCounts,",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Error response"
+          },
+          "401": {
+            "description": "Error response"
+          },
+          "403": {
+            "description": "Error response"
+          },
+          "404": {
+            "description": "Error response"
+          },
+          "409": {
+            "description": "Error response"
+          },
+          "422": {
+            "description": "Error response"
+          }
+        }
+      }
+    },
+    "/api/reports/monthly.csv": {
+      "get": {
+        "operationId": "get__api_reports_monthly_csv",
+        "summary": "GET /api/reports/monthly.csv",
+        "description": "GET    /api/reports/monthly.csv?month=YYYY-MM -> text/csv",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Error response"
+          },
+          "401": {
+            "description": "Error response"
+          },
+          "403": {
+            "description": "Error response"
+          },
+          "404": {
+            "description": "Error response"
+          },
+          "409": {
+            "description": "Error response"
+          },
+          "422": {
+            "description": "Error response"
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "get__api_health",
+        "summary": "GET /api/health",
+        "description": "GET    /api/health",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Error response"
+          },
+          "401": {
+            "description": "Error response"
+          },
+          "403": {
+            "description": "Error response"
+          },
+          "404": {
+            "description": "Error response"
+          },
+          "409": {
+            "description": "Error response"
+          },
+          "422": {
+            "description": "Error response"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    }
+  }
+}
